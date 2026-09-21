@@ -1,0 +1,2878 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AuditMR — Action Environnement</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+:root{--bg:#F4F2EE;--surface:#FFF;--border:#E0DDD8;--text:#1A1A1A;--muted:#6B6B6B;--green:#1B6B2E;--gl:#EAF4EB;--blue:#1A5FA8;--bl:#EDF3FB;--orange:#C84B2F;--ol:#FDF0ED;--red:#B71C1C;--yellow:#F9A825;--r:12px;--rs:8px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:4rem}
+.hdr{background:var(--green);padding:.875rem 1.25rem;position:sticky;top:0;z-index:200;display:flex;align-items:center;gap:10px}
+.hdr h1{font-size:17px;font-weight:700;color:#fff;flex:1;cursor:pointer}
+.hdr p{font-size:11px;color:rgba(255,255,255,.75);font-family:'DM Mono',monospace}
+.bk{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;position:sticky;top:54px;z-index:100}
+.tab{flex-shrink:0;padding:10px 14px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);white-space:nowrap;transition:all .2s;text-align:center}
+.tab span{display:block;font-family:'DM Mono',monospace;font-size:9px;margin-bottom:1px;opacity:.6}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+.scr{display:none;padding:1rem}.scr.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:.875rem}
+.ct{font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.875rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.f{margin-bottom:.875rem}.f:last-child{margin-bottom:0}
+.fl{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px}
+input[type=text],input[type=number],input[type=time],input[type=date],select,textarea{width:100%;font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--green);background:var(--surface)}
+.sw{position:relative}.sw::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:12px}
+.cg{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.cb{padding:7px 13px;border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;background:var(--surface);color:var(--text);transition:all .15s;user-select:none}
+.cb.on{background:var(--green);color:#fff;border-color:var(--green)}
+.yn{display:flex;gap:8px}
+.yb{flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-weight:500;cursor:pointer;text-align:center;background:var(--surface);transition:all .15s;user-select:none}
+.yb.y.on{background:#1B6B2E;color:#fff;border-color:#1B6B2E}
+.yb.n.on{background:#B71C1C;color:#fff;border-color:#B71C1C}
+.ag{display:flex;flex-direction:column;gap:5px}
+.ai{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;background:var(--surface);user-select:none;transition:all .15s}
+.ai.on{background:var(--ol);border-color:var(--orange)}
+.ac{width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;transition:all .15s}
+.ai.on .ac{background:var(--orange);border-color:var(--orange)}
+.al{font-size:13px;flex:1}
+.ch{display:grid;grid-template-columns:1fr 95px 65px;gap:6px;margin-bottom:6px}
+.ch span{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.ch span:nth-child(2),.ch span:nth-child(3){text-align:right}
+.cr{display:grid;grid-template-columns:1fr 95px 65px;gap:6px;align-items:center;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid var(--border)}
+.cr:last-child{border:none;margin-bottom:0;padding-bottom:0}
+.cc{font-size:13px;line-height:1.3}
+.cp{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-align:right}
+.kw{position:relative}
+.ki{text-align:right;padding-right:26px !important;font-family:'DM Mono',monospace;font-size:14px}
+.ku{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--muted);pointer-events:none}
+.tb{background:var(--gl);border:1px solid var(--green);border-radius:var(--rs);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:.5rem}
+.tb .tl{font-size:13px;font-weight:600;color:var(--green)}
+.tb .tv{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--green)}
+.pt{background:var(--gl) !important;border-color:var(--green) !important;font-weight:600;color:var(--green) !important}
+.rw{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.rw:last-child{border:none}
+.rw .rl{color:var(--muted)}
+.rw .rv{font-family:'DM Mono',monospace;font-weight:500}
+.qa{border-radius:var(--rs);padding:10px 14px;font-size:13px;font-weight:500;margin-top:.5rem}
+.qok{background:#E8F5E9;color:#1B6B2E;border:1px solid #1B6B2E}
+.qwarn{background:#FFF8E1;color:#F57F17;border:1px solid #F9A825}
+.pz{border:1.5px dashed var(--border);border-radius:var(--r);padding:1.25rem;text-align:center;position:relative;cursor:pointer;background:var(--surface);margin-bottom:.5rem}
+.pz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.pz p{font-size:14px;color:var(--muted)}
+.pz small{font-size:11px;color:#bbb}
+.pg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:.5rem}
+.pi{position:relative}
+.pi img{width:100%;height:100px;object-fit:cover;border-radius:var(--rs);display:block}
+.pd{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pc{width:100%;font-size:12px;margin-top:4px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;outline:none}
+.pc:focus{border-color:var(--green)}
+.btn{display:block;width:100%;padding:13px;border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;text-align:center;border:none;margin-bottom:8px;transition:opacity .15s,transform .1s}
+.btn:active{transform:scale(.98);opacity:.85}
+.bp{background:var(--green);color:#fff}
+.bb{background:var(--blue);color:#fff}
+.bg{background:transparent;color:var(--text);border:1px solid var(--border)}
+.bo{background:var(--orange);color:#fff}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.dc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center}
+.dn{font-size:30px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace}
+.dl{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.3}
+.dc.w .dn{color:var(--orange)}.dc.e .dn{color:var(--red)}
+.ii{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:opacity .15s}
+.ii:active{opacity:.7}
+.in{font-size:14px;font-weight:600}
+.im{font-size:12px;color:var(--muted);margin-top:2px}
+.pr{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.pt2{font-size:10px;padding:2px 7px;border-radius:10px;font-family:'DM Mono',monospace}
+.pd2{background:var(--gl);color:var(--green)}.pt3{background:#f0f0f0;color:var(--muted)}
+.sd{width:9px;height:9px;border-radius:50%;display:block;margin:0 auto 4px}
+.dd{background:var(--green)}.dp{background:var(--yellow)}.de{background:#ddd}
+.sl{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap}
+.div{height:1px;background:var(--border);margin:1rem 0}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <button class="bk" id="bkBtn" onclick="goBack()" style="display:none">←</button>
+  <div style="flex:1" onclick="showDash()">
+    <h1>AuditMR</h1>
+    <p id="hSub">Action Environnement — Ville de Lévis</p>
+  </div>
+  <button class="bk" onclick="showDash()" title="Accueil">🏠</button>
+</div>
+<div class="tabs" id="tabs" style="display:none">
+  <div class="tab active" onclick="showScr('infos')" id="t-infos"><span>02</span>Infos</div>
+  <div class="tab" onclick="showScr('rec')" id="t-rec"><span>03</span>Recyclage</div>
+  <div class="tab" onclick="showScr('comp')" id="t-comp"><span>04</span>Compost</div>
+  <div class="tab" onclick="showScr('dech')" id="t-dech"><span>05</span>Déchets</div>
+  <div class="tab" onclick="showScr('cmr')" id="t-cmr"><span>06</span>CMR</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="scr active" id="scr-dash">
+  <div class="dg">
+    <div class="dc"><div class="dn" id="d-cmr">0</div><div class="dl">CMR complétées</div></div>
+    <div class="dc"><div class="dn" id="d-aud">0</div><div class="dl">Audits complétés</div></div>
+    <div class="dc w"><div class="dn" id="d-inc">0</div><div class="dl">CMR incomplètes</div></div>
+    <div class="dc e"><div class="dn" id="d-ano">0</div><div class="dl">Anomalies signalées</div></div>
+  </div>
+  <button class="btn bp" onclick="showListe()">Voir les 217 sites ICI →</button>
+  <button class="btn bb" onclick="exportExcel()">⬇ Exporter Excel (toutes les données)</button>
+  <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:-4px">Une ligne par bâtiment — toutes les sections</p>
+</div>
+
+<!-- LISTE -->
+<div class="scr" id="scr-liste">
+  <input type="text" id="srch" placeholder="Rechercher par adresse, nom, quartier…" oninput="filterListe()" style="margin-bottom:.875rem">
+  <button class="btn bb" onclick="exportExcel()" style="margin-bottom:.875rem">⬇ Exporter Excel</button>
+  <div id="iciListe"></div>
+</div>
+
+<!-- INFOS -->
+<div class="scr" id="scr-infos">
+  <div class="card">
+    <div class="ct">Identification du site</div>
+    <div class="f"><div class="fl">Nom</div><input type="text" id="i-nom" readonly style="background:#f0f0f0;color:var(--muted)"></div>
+    <div class="f"><div class="fl">Adresse</div><input type="text" id="i-adr" readonly style="background:#f0f0f0;color:var(--muted)"></div>
+    <div class="f"><div class="fl">Quartier / Type</div><input type="text" id="i-qtype" readonly style="background:#f0f0f0;color:var(--muted)"></div>
+    <div class="f"><div class="fl">Matricule</div><input type="text" id="i-mat" readonly style="background:#f0f0f0;color:var(--muted)"></div>
+    <div class="f"><div class="fl">Date</div><input type="date" id="i-date"></div>
+    <div class="f"><div class="fl">Heure</div><input type="time" id="i-heure"></div>
+    <div class="f"><div class="fl">Conteneur partagé</div>
+      <div class="yn"><div class="yb y" onclick="setYN(this,'i-part','oui')">Oui</div><div class="yb n" onclick="setYN(this,'i-part','non')">Non</div></div>
+      <input type="hidden" id="i-part">
+    </div>
+    <div class="f"><div class="fl">Observations</div><textarea id="i-obs" rows="3" placeholder="Notes libres…"></textarea></div>
+  </div>
+  <button class="btn bp" onclick="saveSection('infos')">Enregistrer ✓</button>
+</div>
+
+<!-- RECYCLAGE -->
+<div class="scr" id="scr-rec">
+  <div class="card">
+    <div class="ct">Informations générales — Recyclage</div>
+    <div class="f"><div class="fl">Type de contenant</div><div class="cg" id="r-tcont"></div></div>
+    <div class="f"><div class="fl">Nombre de contenants</div><input type="number" id="r-nb" min="0" placeholder="0"></div>
+    <div class="f"><div class="fl">Volume du contenant</div><div class="cg" id="r-vol"></div></div>
+    <div class="f"><div class="fl">Niveau de remplissage</div><div class="cg" id="r-rem"></div></div>
+    <div class="f"><div class="fl">Débordement</div><div class="cg" id="r-deb"></div></div>
+    <div class="f"><div class="fl">État du contenant</div><div class="cg" id="r-etat"></div></div>
+    <div class="f"><div class="fl">Accessibilité</div><div class="cg" id="r-acc"></div></div>
+    <div class="f"><div class="fl">Commentaires</div><textarea id="r-com" rows="2" placeholder="Notes…"></textarea></div>
+  </div>
+  <div class="card">
+    <div class="ct">Signalisation</div>
+    <div class="f"><div class="fl">Présente</div><div class="yn"><div class="yb y" onclick="setYN(this,'r-sp','oui')">Oui</div><div class="yb n" onclick="setYN(this,'r-sp','non')">Non</div></div><input type="hidden" id="r-sp"></div>
+    <div class="f"><div class="fl">Visible</div><div class="yn"><div class="yb y" onclick="setYN(this,'r-sv','oui')">Oui</div><div class="yb n" onclick="setYN(this,'r-sv','non')">Non</div></div><input type="hidden" id="r-sv"></div>
+    <div class="f"><div class="fl">Adéquate</div><div class="yn"><div class="yb y" onclick="setYN(this,'r-sa','oui')">Oui</div><div class="yb n" onclick="setYN(this,'r-sa','non')">Non</div></div><input type="hidden" id="r-sa"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Qualité des matières</div>
+    <div class="f"><div class="fl">Matière dominante</div><div class="cg" id="r-mdom"></div></div>
+    <div class="f"><div class="fl">Niveau de contamination</div><div class="cg" id="r-cont"></div></div>
+    <div class="f"><div class="fl">Principaux contaminants</div><div class="ag" id="r-contam"></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Photos — Recyclage</div>
+    <div class="pz"><input type="file" accept="image/*" multiple capture="environment" onchange="addPhotos(event,'rec')"><p>📷 Prendre ou ajouter des photos</p><small>Légende pour chaque photo · max 15</small></div>
+    <div class="pg" id="rec-pg"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Anomalies observées</div>
+    <div class="ag" id="r-anom"></div>
+    <div class="f" style="margin-top:.875rem"><div class="fl">Commentaires</div><textarea id="r-acom" rows="2" placeholder="Autres observations…"></textarea></div>
+  </div>
+  <button class="btn bp" onclick="saveSection('rec')">Enregistrer audit recyclage ✓</button>
+</div>
+
+<!-- COMPOST -->
+<div class="scr" id="scr-comp">
+  <div class="card">
+    <div class="ct">Informations générales — Compost</div>
+    <div class="f"><div class="fl">Type de contenant</div><div class="cg" id="c-tcont"></div></div>
+    <div class="f"><div class="fl">Nombre de contenants</div><input type="number" id="c-nb" min="0" placeholder="0"></div>
+    <div class="f"><div class="fl">Volume du contenant</div><div class="cg" id="c-vol"></div></div>
+    <div class="f"><div class="fl">Niveau de remplissage</div><div class="cg" id="c-rem"></div></div>
+    <div class="f"><div class="fl">Débordement</div><div class="cg" id="c-deb"></div></div>
+    <div class="f"><div class="fl">État du contenant</div><div class="cg" id="c-etat"></div></div>
+    <div class="f"><div class="fl">Accessibilité</div><div class="cg" id="c-acc"></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Signalisation</div>
+    <div class="f"><div class="fl">Présente</div><div class="yn"><div class="yb y" onclick="setYN(this,'c-sp','oui')">Oui</div><div class="yb n" onclick="setYN(this,'c-sp','non')">Non</div></div><input type="hidden" id="c-sp"></div>
+    <div class="f"><div class="fl">Visible</div><div class="yn"><div class="yb y" onclick="setYN(this,'c-sv','oui')">Oui</div><div class="yb n" onclick="setYN(this,'c-sv','non')">Non</div></div><input type="hidden" id="c-sv"></div>
+    <div class="f"><div class="fl">Adéquate</div><div class="yn"><div class="yb y" onclick="setYN(this,'c-sa','oui')">Oui</div><div class="yb n" onclick="setYN(this,'c-sa','non')">Non</div></div><input type="hidden" id="c-sa"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Qualité des matières</div>
+    <div class="f"><div class="fl">Matière dominante</div><div class="cg" id="c-mdom"></div></div>
+    <div class="f"><div class="fl">Niveau de contamination</div><div class="cg" id="c-cont"></div></div>
+    <div class="f"><div class="fl">Principaux contaminants</div><div class="ag" id="c-contam"></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Photos — Compost</div>
+    <div class="pz"><input type="file" accept="image/*" multiple capture="environment" onchange="addPhotos(event,'comp')"><p>📷 Prendre ou ajouter des photos</p><small>Légende pour chaque photo · max 15</small></div>
+    <div class="pg" id="comp-pg"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Anomalies observées</div>
+    <div class="ag" id="c-anom"></div>
+    <div class="f" style="margin-top:.875rem"><div class="fl">Commentaires</div><textarea id="c-acom" rows="2" placeholder="Autres observations…"></textarea></div>
+  </div>
+  <button class="btn bp" onclick="saveSection('comp')">Enregistrer audit compost ✓</button>
+</div>
+
+<!-- DÉCHETS -->
+<div class="scr" id="scr-dech">
+  <div class="card">
+    <div class="ct">Informations générales — Déchets</div>
+    <div class="f"><div class="fl">Type d'équipement</div><div class="cg" id="d-tcont"></div></div>
+    <div class="f"><div class="fl">Nombre de contenants</div><input type="number" id="d-nb" min="0" placeholder="0"></div>
+    <div class="f"><div class="fl">Volume du contenant</div><div class="cg" id="d-vol"></div></div>
+    <div class="f"><div class="fl">Niveau de remplissage</div><div class="cg" id="d-rem"></div></div>
+    <div class="f"><div class="fl">État du contenant</div><div class="cg" id="d-etat"></div></div>
+    <div class="f"><div class="fl">Accessibilité</div><div class="cg" id="d-acc"></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Anomalies et observations</div>
+    <div class="ag" id="d-anom"></div>
+    <div class="f" style="margin-top:.875rem"><div class="fl">Commentaires</div><textarea id="d-acom" rows="3" placeholder="Observations…"></textarea></div>
+  </div>
+  <div class="card">
+    <div class="ct">Photos — Déchets</div>
+    <div class="pz"><input type="file" accept="image/*" multiple capture="environment" onchange="addPhotos(event,'dech')"><p>📷 Prendre ou ajouter des photos</p><small>Contenant et contenu · max 15</small></div>
+    <div class="pg" id="dech-pg"></div>
+  </div>
+  <button class="btn bp" onclick="saveSection('dech')">Enregistrer audit déchets ✓</button>
+</div>
+
+<!-- CMR -->
+<div class="scr" id="scr-cmr">
+  <div class="card">
+    <div class="ct">Échantillon</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="f"><div class="fl">Nombre de sacs</div><input type="number" id="m-sacs" min="0" placeholder="0" oninput="calcCMR()"></div>
+      <div class="f"><div class="fl">Nombre de bacs</div><input type="number" id="m-bacs" min="0" placeholder="0" oninput="calcCMR()"></div>
+    </div>
+    <div class="f"><div class="fl">Poids total de l'échantillon</div>
+      <div class="kw"><input class="ki pt" type="number" id="m-ptot" min="0" step="0.1" placeholder="0.0" oninput="calcCMR()"><span class="ku">kg</span></div>
+    </div>
+    <div class="f"><div class="fl">Classe de poids</div><div class="cg" id="m-cls"></div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Grille de tri — Pesées</div>
+    <div class="ch"><span>Catégorie</span><span>Poids</span><span>%</span></div>
+    <div id="m-grille"></div>
+    <div class="tb"><span class="tl">Total saisi</span><span class="tv" id="m-tot">0,0 kg</span></div>
+    <div id="m-qmsg"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Résultats automatiques</div>
+    <div class="rw"><span class="rl">Taux de contamination</span><span class="rv" id="m-tcont">—</span></div>
+    <div class="rw"><span class="rl">Taux de récupération potentiel</span><span class="rv" id="m-trec">—</span></div>
+    <div class="rw"><span class="rl">Masse moyenne par sac</span><span class="rv" id="m-msac">—</span></div>
+    <div class="rw"><span class="rl">Masse moyenne par bac</span><span class="rv" id="m-mbac">—</span></div>
+    <div class="rw"><span class="rl">Catégories présentes</span><span class="rv" id="m-ncat">—</span></div>
+  </div>
+  <div class="card">
+    <div class="ct">Documentation photo</div>
+    <div class="pz"><input type="file" accept="image/*" multiple capture="environment" onchange="addPhotos(event,'cmr')"><p>📷 Échantillon avant tri · Matières triées · Contamination</p><small>max 15 photos</small></div>
+    <div class="pg" id="cmr-pg"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Anomalies observées</div>
+    <div class="ag" id="m-anom"></div>
+    <div class="f" style="margin-top:.875rem"><div class="fl">Autres anomalies</div><textarea id="m-acom" rows="2" placeholder="Commentaire…"></textarea></div>
+  </div>
+  <div class="card">
+    <div class="ct">Contrôle qualité</div>
+    <div class="rw"><span class="rl">Somme = poids total</span><span class="rv" id="m-valid">—</span></div>
+    <div class="f" style="margin-top:.5rem"><div class="fl">Photos complétées</div><div class="yn"><div class="yb y" onclick="setYN(this,'m-pok','oui')">Oui</div><div class="yb n" onclick="setYN(this,'m-pok','non')">Non</div></div><input type="hidden" id="m-pok"></div>
+    <div class="f"><div class="fl">Échantillon conforme</div><div class="yn"><div class="yb y" onclick="setYN(this,'m-conf','oui')">Oui</div><div class="yb n" onclick="setYN(this,'m-conf','non')">Non</div></div><input type="hidden" id="m-conf"></div>
+  </div>
+  <button class="btn bp" onclick="saveSection('cmr')">Enregistrer la CMR ✓</button>
+  <button class="btn bo" onclick="genPDF()">📄 Générer fiche PDF</button>
+</div>
+
+<script>
+const VOLS=['240 L','360 L','660 L','1 100 L','2 vg','4 vg','6 vg','8 vg','9 vg'];
+const REMS=['0–25 %','26–50 %','51–75 %','76–100 %'];
+const TCONTS=['Bac roulant','Conteneur','CCA','Compacteur','Semi-enfoui','Autre'];
+const DEBS=['Aucun','Léger','Important'];
+const ETATS=['Bon','Moyen','Mauvais'];
+const ACCS=['Facile','Moyenne','Difficile'];
+const CONTS=['0 %','10 %','20 %','30 %','40 %','50 %','60 %','70 %','80 %','90 %','100 %'];
+const R_MDOM=['Papier','Carton','Plastique','Métal','Verre','Contaminant'];
+const C_MDOM=['Matière organique','Matières compostables','Contaminant','Autre'];
+const R_CONTAM=['Sacs noirs','Matières organiques','Carton souillé','Pellicules plastiques','Verre brisé','Métal','Résidus alimentaires','Déchets sanitaires','Produits électroniques','Résidus dangereux','Autre'];
+const C_CONTAM=['Matière recyclable','Contenants et emballages non compostables','Déchets ultimes','Autre — préciser'];
+const R_ANOM=['Présence importante de carton','Sacs noirs dans le recyclage','Contamination plastique','Bac sous-utilisé','Bac trop petit','Dépôts au sol','Autre'];
+const C_ANOM=['Compost très propre','Présence importante de résidus alimentaires','Plastique dans le compost','Bac sous-utilisé','Bac débordant','Odeurs importantes','Présence de lixiviat','Présence d\'animaux nuisibles','Autre'];
+const CMR_CATS=[
+  'Papier / carton plat',
+  'Carton ondulé',
+  'Plastique, verre, métal',
+  'Résidus alimentaires de toutes sortes',
+  'Résidus verts',
+  'Autres matières compostables',
+  'Déchets ultimes',
+  'Résidus domestiques dangereux',
+  'Résidus de construction, rénovation, démolition'
+];
+const CMR_LABELS=[
+  'Papier / carton plat',
+  'Carton ondulé',
+  'Plastique, verre, métal',
+  'Résidus alimentaires de toutes sortes',
+  'Résidus verts : rognures de gazon, feuilles et autres résidus verts',
+  'Autres matières compostables : carton souillé, papier essuie-tout, mouchoirs et papiers parchemin',
+  'Déchets ultimes : ustensiles de plastique, textiles, plastique non recyclable, styromousse expansée',
+  'Résidus domestiques dangereux : pile, peinture, huile, huile à friture, etc.',
+  'Résidus de construction, rénovation, démolition : bois, gypse, isolant, granulat'
+];
+const CMR_REC=['Papier / carton plat','Carton ondulé','Plastique, verre, métal'];
+const CMR_ANOM=['Matières dangereuses','Dépôts exceptionnels','Liquides abondants','Odeurs importantes','Échantillon non représentatif'];
+
+const GS='https://script.google.com/macros/s/AKfycbzdC-HBqo6DVQvZ9zfgaMoNNcUah7qi2vD6NM18b5SzaZ9VLiHhdkPh3vTQNcGyWRdq/exec';
+let data={}, cur=null, photos={rec:[],comp:[],dech:[],cmr:[]};
+
+// Load text data from Google Sheets on startup
+async function loadSheets(){
+  showMsg('⏳ Chargement…');
+  try{
+    const r=await fetch(GS+'?sheet=AuditMR');
+    const j=await r.json();
+    data={};
+    (j.rows||[]).forEach(row=>{
+      if(!row[0]||row[0]==='')return;
+      try{data[String(row[0])]=JSON.parse(row[6]||'{}');}catch(e){}
+    });
+    showMsg('✓ Données chargées');
+  }catch(e){
+    // Fall back to localStorage if offline
+    try{const s=localStorage.getItem('auditMR_v3');if(s)data=JSON.parse(s);}catch(e2){}
+    showMsg('⚠ Mode hors ligne');
+  }
+  renderListe();updateDash();
+}
+
+// Save text data to Google Sheets (no photos)
+async function saveToSheets(k,record){
+  // Strip photos before sending to sheets
+  const clean=JSON.parse(JSON.stringify(record));
+  ['rec','comp','cmr'].forEach(v=>{if(clean[v])delete clean[v]._photos;});
+  const ici=ICI_LIST.find(i=>String(i.no)===k);
+  const row=[k,ici?.nom||'',ici?.adresse||'',ici?.quartier||'',ici?.type||'',ici?.matricule||'',JSON.stringify(clean)];
+  try{
+    await fetch(GS,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'save',sheet:'AuditMR',key:k,row})});
+    // Also save to localStorage as backup
+    localStorage.setItem('auditMR_v3',JSON.stringify(data));
+    showMsg('✓ Sauvegardé');
+  }catch(e){
+    // Save to localStorage only
+    try{localStorage.setItem('auditMR_v3',JSON.stringify(data));}catch(e2){}
+    showMsg('✓ Sauvegardé localement');
+  }
+}
+
+// Photos stay in sessionStorage (cleared when browser closes = frees space daily)
+function loadSessionPhotos(k){
+  try{
+    const s=sessionStorage.getItem('photos_'+k);
+    if(s){const p=JSON.parse(s);photos.rec=p.rec||[];photos.comp=p.comp||[];photos.dech=p.dech||[];photos.cmr=p.cmr||[];}
+    else{photos={rec:[],comp:[],dech:[],cmr:[]};}
+  }catch(e){photos={rec:[],comp:[],dech:[],cmr:[]};}
+}
+function saveSessionPhotos(k){
+  try{sessionStorage.setItem('photos_'+k,JSON.stringify(photos));}catch(e){}
+}
+
+function showMsg(msg){
+  let el=document.getElementById('sync-msg');
+  if(!el){el=document.createElement('div');el.id='sync-msg';
+    el.style.cssText='position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:9999;transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(el);}
+  el.textContent=msg;el.style.opacity='1';
+  clearTimeout(el._t);
+  if(!msg.includes('⏳'))el._t=setTimeout(()=>el.style.opacity='0',3000);
+}
+
+function save(){
+  try{localStorage.setItem('auditMR_v3',JSON.stringify(data));}catch(e){}
+}
+function getD(k){if(!data[k])data[k]={infos:{},rec:{},comp:{},cmr:{}};return data[k];}
+function fmt(n,d=1){return(typeof n==='number'&&!isNaN(n))?n.toFixed(d).replace('.',','):'—';}
+function sk(s){return s.replace(/[^a-z0-9]/gi,'_');}
+
+// NAV
+function showDash(){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scr-dash').classList.add('active');
+  document.getElementById('tabs').style.display='none';
+  document.getElementById('bkBtn').style.display='none';
+  document.getElementById('hSub').textContent='Action Environnement — Ville de Lévis';
+  cur=null; updateDash(); window.scrollTo(0,0);
+}
+function showListe(){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scr-liste').classList.add('active');
+  document.getElementById('tabs').style.display='none';
+  document.getElementById('bkBtn').style.display='flex';
+  renderListe(); window.scrollTo(0,0);
+}
+function goBack(){
+  if(document.getElementById('scr-liste').classList.contains('active'))showDash();
+  else showListe();
+}
+function selICI(k){
+  cur=k;
+  const ici=ICI_LIST.find(i=>String(i.no)===k);
+  document.getElementById('hSub').textContent=ici?ici.adresse:k;
+  document.getElementById('tabs').style.display='flex';
+  document.getElementById('bkBtn').style.display='flex';
+  loadSessionPhotos(k);
+  showScr('infos');
+}
+function showScr(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('scr-'+id).classList.add('active');
+  const t=document.getElementById('t-'+id);if(t)t.classList.add('active');
+  if(id==='infos')loadInfos();
+  if(id==='rec')loadAudit('rec');
+  if(id==='comp')loadAudit('comp');
+  if(id==='dech')loadAudit('dech');
+  if(id==='cmr')loadCMR();
+  window.scrollTo(0,0);
+}
+
+// LISTE
+function renderListe(q=''){
+  const el=document.getElementById('iciListe');
+  const f=ICI_LIST.filter(i=>!q||[i.nom,i.adresse,i.quartier,i.matricule,String(i.no)].some(v=>(v||'').toLowerCase().includes(q.toLowerCase())));
+  if(!f.length){el.innerHTML='<p style="font-size:13px;color:var(--muted);padding:1rem">Aucun résultat.</p>';return;}
+  el.innerHTML=f.map(i=>{
+    const k=String(i.no),d=data[k]||{};
+    const hi=d.infos&&d.infos._s,hr=d.rec&&d.rec._s,hc=d.comp&&d.comp._s,hm=d.cmr&&d.cmr._s;
+    const all=hi&&hr&&hc&&hm,any=hi||hr||hc||hm;
+    return`<div class="ii" onclick="selICI('${k}')">
+      <div style="flex:1;min-width:0">
+        <div class="in" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${i.nom||'—'}</div>
+        <div class="im">${i.adresse}</div>
+        <div class="im">${i.quartier} · ${i.type||''}</div>
+        <div class="pr">
+          <span class="pt2 ${hi?'pd2':'pt3'}">Infos</span>
+          <span class="pt2 ${hr?'pd2':'pt3'}">Rec.</span>
+          <span class="pt2 ${hc?'pd2':'pt3'}">Comp.</span>
+          <span class="pt2 ${(d.dech&&d.dech._s)?'pd2':'pt3'}">Déchets</span>
+          <span class="pt2 ${hm?'pd2':'pt3'}">CMR</span>
+        </div>
+      </div>
+      <div style="text-align:center;flex-shrink:0;margin-left:10px">
+        <span class="sd ${all?'dd':any?'dp':'de'}"></span>
+        <span class="sl">${all?'Complet':any?'Partiel':'Vide'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterListe(){renderListe(document.getElementById('srch').value);}
+
+// DASHBOARD
+function updateDash(){
+  let cm=0,au=0,inc=0,an=0;
+  ICI_LIST.forEach(i=>{
+    const d=data[String(i.no)]||{};
+    if(d.cmr&&d.cmr._s)cm++;
+    if(d.rec&&d.rec._s&&d.comp&&d.comp._s)au++;
+    if(d.cmr&&d.cmr._s&&d.cmr.conforme==='non')inc++;
+    if(d.cmr&&d.cmr.anomalies&&d.cmr.anomalies.length>0)an++;
+  });
+  document.getElementById('d-cmr').textContent=cm;
+  document.getElementById('d-aud').textContent=au;
+  document.getElementById('d-inc').textContent=inc;
+  document.getElementById('d-ano').textContent=an;
+}
+
+// UI HELPERS
+function mkChoices(id,opts,saved,single=true){
+  const el=document.getElementById(id);if(!el)return;
+  const sv=Array.isArray(saved)?saved:(saved?[saved]:[]);
+  el.innerHTML=opts.map(o=>`<div class="cb ${sv.includes(o)?'on':''}" onclick="pickChoice(this,'${id}',${single})">${o}</div>`).join('');
+}
+function pickChoice(btn,gid,single){
+  const g=document.getElementById(gid);
+  if(single)g.querySelectorAll('.cb').forEach(b=>b.classList.remove('on'));
+  btn.classList.toggle('on');
+  if(single&&!btn.classList.contains('on'))btn.classList.add('on');
+}
+function getChoice(id,single=true){
+  const el=document.getElementById(id);if(!el)return single?'':[];
+  const s=[...el.querySelectorAll('.cb.on')].map(b=>b.textContent);
+  return single?(s[0]||''):s;
+}
+function setYN(btn,hid,val){
+  btn.parentElement.querySelectorAll('.yb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(hid).value=val;
+}
+function loadYN(hid,val){
+  const h=document.getElementById(hid);if(!h)return;
+  h.value=val||'';
+  const g=h.previousElementSibling;
+  if(g)g.querySelectorAll('.yb').forEach(b=>{
+    b.classList.remove('on');
+    if((val==='oui'&&b.classList.contains('y'))||(val==='non'&&b.classList.contains('n')))b.classList.add('on');
+  });
+}
+function mkAnoms(id,opts,saved=[]){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=opts.map(o=>`<div class="ai ${saved.includes(o)?'on':''}" onclick="this.classList.toggle('on')"><div class="ac"></div><span class="al">${o}</span></div>`).join('');
+}
+function getAnoms(id){return[...document.querySelectorAll(`#${id} .ai.on`)].map(e=>e.querySelector('.al').textContent);}
+
+// PHOTOS
+function compressPhoto(file, maxW, maxH, quality, cb){
+  const img=new Image();
+  const url=URL.createObjectURL(file);
+  img.onload=function(){
+    let w=img.width,h=img.height;
+    if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+    if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+    const canvas=document.createElement('canvas');
+    canvas.width=w;canvas.height=h;
+    canvas.getContext('2d').drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    cb(canvas.toDataURL('image/jpeg',quality));
+  };
+  img.src=url;
+}
+function addPhotos(e,v){
+  const files=Array.from(e.target.files);
+  const rem=15-photos[v].length;
+  files.slice(0,rem).forEach(f=>{
+    compressPhoto(f,1200,900,0.6,src=>{
+      photos[v].push({src,cap:''});
+      renderPhotos(v);
+    });
+  });
+  e.target.value='';
+}
+function renderPhotos(v){
+  const g=document.getElementById(v+'-pg');if(!g)return;
+  g.innerHTML=photos[v].map((p,i)=>`
+    <div class="pi">
+      <img src="${p.src}" alt="photo ${i+1}">
+      <button class="pd" onclick="delPhoto('${v}',${i})">×</button>
+      <input class="pc" type="text" placeholder="Légende…" value="${p.cap}" oninput="photos['${v}'][${i}].cap=this.value">
+    </div>`).join('');
+  const pz=document.querySelector(`#scr-${v==='cmr'?'cmr':v==='rec'?'rec':'comp'} .pz`);
+  if(pz)pz.style.display=photos[v].length>=15?'none':'block';
+}
+function delPhoto(v,i){photos[v].splice(i,1);renderPhotos(v);}
+
+// LOAD SECTIONS
+function loadInfos(){
+  const ici=ICI_LIST.find(i=>String(i.no)===cur);
+  const d=getD(cur).infos;
+  document.getElementById('i-nom').value=ici?ici.nom:'';
+  document.getElementById('i-adr').value=ici?ici.adresse:'';
+  document.getElementById('i-qtype').value=ici?(ici.quartier+(ici.type?' · '+ici.type:'')):'';
+  document.getElementById('i-mat').value=ici?ici.matricule:'';
+  document.getElementById('i-date').value=d.date||new Date().toISOString().slice(0,10);
+  document.getElementById('i-heure').value=d.heure||new Date().toTimeString().slice(0,5);
+  document.getElementById('i-obs').value=d.obs||'';
+  loadYN('i-part',d.partage);
+}
+const D_ANOM=["Débordement","Dépôts au sol","Accès bloqué","Odeurs importantes","Présence d'animaux nuisibles","Bac endommagé","Autre"];
+
+function loadAudit(v){
+  if(v==='dech'){
+    const d=getD(cur).dech||{};
+    mkChoices('d-tcont',TCONTS,d.tcont);
+    mkChoices('d-vol',VOLS,d.vol);
+    mkChoices('d-rem',REMS,d.rem);
+    mkChoices('d-etat',ETATS,d.etat);
+    mkChoices('d-acc',ACCS,d.acc);
+    mkAnoms('d-anom',D_ANOM,d.anom||[]);
+    const nb=document.getElementById('d-nb');if(nb)nb.value=d.nb||'';
+    const acom=document.getElementById('d-acom');if(acom)acom.value=d.acom||'';
+    renderPhotos('dech');
+    return;
+  }
+  const p=v==='rec'?'r':'c';
+  const d=getD(cur)[v]||{};
+  mkChoices(p+'-tcont',TCONTS,d.tcont);
+  mkChoices(p+'-vol',VOLS,d.vol);
+  mkChoices(p+'-rem',REMS,d.rem);
+  mkChoices(p+'-deb',DEBS,d.deb);
+  mkChoices(p+'-etat',ETATS,d.etat);
+  mkChoices(p+'-acc',ACCS,d.acc);
+  mkChoices(p+'-mdom',v==='rec'?R_MDOM:C_MDOM,d.mdom);
+  mkChoices(p+'-cont',CONTS,d.cont);
+  mkAnoms(p+'-contam',v==='rec'?R_CONTAM:C_CONTAM,d.contam||[]);
+  mkAnoms(p+'-anom',v==='rec'?R_ANOM:C_ANOM,d.anom||[]);
+  const nb=document.getElementById(p+'-nb');if(nb)nb.value=d.nb||'';
+  const com=document.getElementById(p+'-com');if(com)com.value=d.com||'';
+  const acom=document.getElementById(p+'-acom');if(acom)acom.value=d.acom||'';
+  ['sp','sv','sa'].forEach(f=>loadYN(p+'-'+f,d[f]));
+  renderPhotos(v);
+}
+function loadCMR(){
+  const d=getD(cur).cmr||{};
+  document.getElementById('m-sacs').value=d.sacs||'';
+  document.getElementById('m-bacs').value=d.bacs||'';
+  document.getElementById('m-ptot').value=d.ptot||'';
+  mkChoices('m-cls',['<30 kg','30–49 kg','≥50 kg'],d.cls);
+  mkAnoms('m-anom',CMR_ANOM,d.anom||[]);
+  const acom=document.getElementById('m-acom');if(acom)acom.value=d.acom||'';
+  loadYN('m-pok',d.pok);loadYN('m-conf',d.conf);
+  const g=document.getElementById('m-grille');
+  const pesees=d.pesees||{};
+  g.innerHTML=CMR_CATS.map((c,i)=>`
+    <div class="cr">
+      <span class="cc">${CMR_LABELS[i]}</span>
+      <div class="kw"><input class="ki" type="number" min="0" step="0.1" placeholder="0.0" id="m_${sk(c)}" value="${pesees[c]||''}" oninput="calcCMR()"><span class="ku">kg</span></div>
+      <span class="cp" id="mp_${sk(c)}">—</span>
+    </div>`).join('');
+  renderPhotos('cmr');calcCMR();
+}
+
+// CMR CALC
+function calcCMR(){
+  let tot=0;const p={};
+  CMR_CATS.forEach(c=>{const el=document.getElementById('m_'+sk(c));const v=parseFloat(el?.value)||0;p[c]=v;tot+=v;});
+  CMR_CATS.forEach(c=>{const el=document.getElementById('mp_'+sk(c));if(el)el.textContent=tot>0?fmt(p[c]/tot*100)+'%':'—';});
+  document.getElementById('m-tot').textContent=fmt(tot)+' kg';
+  const ptot=parseFloat(document.getElementById('m-ptot').value)||0;
+  const diff=Math.abs(tot-ptot);
+  const msg=document.getElementById('m-qmsg');
+  const val=document.getElementById('m-valid');
+  if(ptot>0){
+    if(diff<0.5){msg.innerHTML='<div class="qa qok">✓ Somme conforme au poids total</div>';val.textContent='✓ Conforme';}
+    else{msg.innerHTML=`<div class="qa qwarn">⚠ Écart de ${fmt(diff)} kg</div>`;val.textContent='⚠ Écart '+fmt(diff)+' kg';}
+  }else{msg.innerHTML='';val.textContent='—';}
+  const rec=CMR_REC.reduce((s,c)=>s+(p[c]||0),0);
+  const contam=(p['Résidus domestiques dangereux (RDD)']||0)+(p['Déchets sanitaires']||0);
+  const ns=parseInt(document.getElementById('m-sacs').value)||0;
+  const nb=parseInt(document.getElementById('m-bacs').value)||0;
+  const nc=CMR_CATS.filter(c=>(p[c]||0)>0).length;
+  document.getElementById('m-tcont').textContent=tot>0?fmt(contam/tot*100)+' %':'—';
+  document.getElementById('m-trec').textContent=tot>0?fmt(rec/tot*100)+' %':'—';
+  document.getElementById('m-msac').textContent=ns>0?fmt(tot/ns)+' kg':'—';
+  document.getElementById('m-mbac').textContent=nb>0?fmt(tot/nb)+' kg':'—';
+  document.getElementById('m-ncat').textContent=nc>0?nc:'—';
+  if(ptot>0){const t=ptot<30?'<30 kg':ptot<50?'30–49 kg':'≥50 kg';document.querySelectorAll('#m-cls .cb').forEach(b=>b.classList.toggle('on',b.textContent===t));}
+}
+
+// SAVE SECTIONS
+function saveSection(sec){
+  const d=getD(cur);
+  if(sec==='infos'){
+    d.infos={date:document.getElementById('i-date').value,heure:document.getElementById('i-heure').value,partage:document.getElementById('i-part').value,obs:document.getElementById('i-obs').value,_s:true};
+  }
+  if(sec==='rec'||sec==='comp'){
+    const p=sec==='rec'?'r':'c';
+    d[sec]={
+      tcont:getChoice(p+'-tcont'),nb:document.getElementById(p+'-nb').value,
+      vol:getChoice(p+'-vol'),rem:getChoice(p+'-rem'),deb:getChoice(p+'-deb'),
+      etat:getChoice(p+'-etat'),acc:getChoice(p+'-acc'),com:document.getElementById(p+'-com')?.value||'',
+      sp:document.getElementById(p+'-sp').value,sv:document.getElementById(p+'-sv').value,sa:document.getElementById(p+'-sa').value,
+      mdom:getChoice(p+'-mdom'),cont:getChoice(p+'-cont'),
+      contam:getAnoms(p+'-contam'),anom:getAnoms(p+'-anom'),acom:document.getElementById(p+'-acom').value,
+      _photos:photos[sec].map(ph=>({src:ph.src,cap:ph.cap})),nbP:photos[sec].length,_s:true
+    };
+  }
+  if(sec==='dech'){
+    d.dech={
+      tcont:getChoice('d-tcont'),nb:document.getElementById('d-nb').value,
+      vol:getChoice('d-vol'),rem:getChoice('d-rem'),
+      etat:getChoice('d-etat'),acc:getChoice('d-acc'),
+      anom:getAnoms('d-anom'),acom:document.getElementById('d-acom').value,
+      _photos:photos.dech.map(ph=>({src:ph.src,cap:ph.cap})),nbP:photos.dech.length,_s:true
+    };
+  }
+  if(sec==='cmr'){
+    const pesees={};
+    CMR_CATS.forEach(c=>{const el=document.getElementById('m_'+sk(c));pesees[c]=parseFloat(el?.value)||0;});
+    d.cmr={sacs:document.getElementById('m-sacs').value,bacs:document.getElementById('m-bacs').value,
+      ptot:document.getElementById('m-ptot').value,cls:getChoice('m-cls'),pesees,
+      pok:document.getElementById('m-pok').value,conf:document.getElementById('m-conf').value,
+      anom:getAnoms('m-anom'),acom:document.getElementById('m-acom').value,
+      tcont:document.getElementById('m-tcont').textContent,trec:document.getElementById('m-trec').textContent,
+      _photos:photos.cmr.map(ph=>({src:ph.src,cap:ph.cap})),nbP:photos.cmr.length,_s:true};
+  }
+  save();
+  saveSessionPhotos(cur);
+  saveToSheets(cur,getD(cur));
+  // Show confirmation
+  const btn=event.target;
+  const orig=btn.textContent;
+  btn.textContent='✓ Enregistré!';btn.style.background='#1B6B2E';
+  setTimeout(()=>{btn.textContent=orig;btn.style.background='';},2000);
+}
+
+// EXPORT EXCEL
+async function exportExcel(){
+  showMsg('⏳ Chargement pour export…');
+  try{
+    const r=await fetch(GS+'?sheet=AuditMR');
+    const j=await r.json();
+    data={};
+    (j.rows||[]).forEach(row=>{
+      if(!row[0]||row[0]==='')return;
+      try{data[String(row[0])]=JSON.parse(row[6]||'{}');}catch(e){}
+    });
+  }catch(e){showMsg('⚠ Export depuis cache local');}
+  const header=['No','Nom','Adresse','Quartier','Type','Matricule','Date','Heure','Conteneur partagé','Observations',
+    'Rec-Type contenant','Rec-Nb contenants','Rec-Volume','Rec-Remplissage','Rec-Débordement','Rec-État','Rec-Accessibilité','Rec-Commentaires',
+    'Rec-Sig.présente','Rec-Sig.visible','Rec-Sig.adéquate','Rec-Matière dominante','Rec-Contamination','Rec-Contaminants','Rec-Anomalies','Rec-Nb photos',
+    'Comp-Type contenant','Comp-Nb contenants','Comp-Volume','Comp-Remplissage','Comp-Débordement','Comp-État','Comp-Accessibilité',
+    'Comp-Sig.présente','Comp-Sig.visible','Comp-Sig.adéquate','Comp-Matière dominante','Comp-Contamination','Comp-Contaminants','Comp-Anomalies','Comp-Nb photos',
+    'Déchets-Type équipement','Déchets-Nb contenants','Déchets-Volume','Déchets-Remplissage','Déchets-État','Déchets-Accessibilité','Déchets-Anomalies','Déchets-Nb photos',
+    'CMR-Nb sacs','CMR-Nb bacs','CMR-Poids total (kg)','CMR-Classe poids',
+    ...CMR_CATS.map(c=>'CMR-'+c+' (kg)'),
+    ...CMR_CATS.map(c=>'CMR-'+c+' (%)'),
+    'CMR-Taux contamination','CMR-Taux récupération','CMR-Conforme','CMR-Anomalies','CMR-Nb photos'];
+  
+  // Only export sites with at least some data
+  const rows=[header];
+  ICI_LIST.forEach(i=>{
+    const k=String(i.no),d=data[k]||{};
+    if(!d.infos&&!d.rec&&!d.comp&&!d.cmr)return; // skip empty
+    const inf=d.infos||{},rec=d.rec||{},comp=d.comp||{},dech=d.dech||{},cmr=d.cmr||{},p=cmr.pesees||{};
+    const tot=CMR_CATS.reduce((s,c)=>s+(p[c]||0),0);
+    rows.push([
+      i.no,i.nom,i.adresse,i.quartier,i.type,i.matricule,
+      inf.date||'',inf.heure||'',inf.partage||'',inf.obs||'',
+      rec.tcont||'',rec.nb||'',rec.vol||'',rec.rem||'',rec.deb||'',rec.etat||'',rec.acc||'',rec.com||'',
+      rec.sp||'',rec.sv||'',rec.sa||'',rec.mdom||'',rec.cont||'',
+      (rec.contam||[]).join(', '),(rec.anom||[]).join(', '),rec.nbP||0,
+      comp.tcont||'',comp.nb||'',comp.vol||'',comp.rem||'',comp.deb||'',comp.etat||'',comp.acc||'',
+      comp.sp||'',comp.sv||'',comp.sa||'',comp.mdom||'',comp.cont||'',
+      (comp.contam||[]).join(', '),(comp.anom||[]).join(', '),comp.nbP||0,
+      dech.tcont||'',dech.nb||'',dech.vol||'',dech.rem||'',dech.etat||'',dech.acc||'',
+      (dech.anom||[]).join(', '),dech.nbP||0,
+      cmr.sacs||'',cmr.bacs||'',cmr.ptot||'',cmr.cls||'',
+      ...CMR_CATS.map(c=>p[c]||0),
+      ...CMR_CATS.map(c=>tot>0?+((p[c]||0)/tot*100).toFixed(1):0),
+      cmr.tcont||'',cmr.trec||'',cmr.conf||'',(cmr.anom||[]).join(', '),cmr.nbP||0
+    ]);
+  });
+  if(rows.length===1){alert('Aucune donnée saisie à exporter.');return;}
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=header.map(()=>({wch:16}));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'AuditMR');
+  XLSX.writeFile(wb,'AuditMR_Lévis_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
+
+// PDF PAR ÉDIFICE
+function mkPhotoGrid(photoArr){
+  if(!photoArr||!photoArr.length) return '';
+  return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">
+    ${photoArr.map(ph=>`<div><img src="${ph.src}" style="width:100%;height:90px;object-fit:cover;border-radius:5px;border:1px solid #eee"><div style="font-size:9px;color:#555;margin-top:3px;text-align:center;line-height:1.3">${ph.cap||'Sans légende'}</div></div>`).join('')}
+  </div>`;
+}
+
+function mkAuditSection(label, color, data, photoArr){
+  const d = data||{};
+  const rows = [
+    ['Type de contenant / équipement', d.tcont],
+    ['Nombre de contenants', d.nb],
+    ['Volume du contenant', d.vol],
+    ['Niveau de remplissage', d.rem],
+    ['Débordement', d.deb],
+    ['État du contenant', d.etat],
+    ['Accessibilité', d.acc],
+    ['Signalisation présente', d.sp],
+    ['Signalisation visible', d.sv],
+    ['Signalisation adéquate', d.sa],
+    ['Matière dominante', d.mdom],
+    ['Niveau de contamination', d.cont],
+    ['Principaux contaminants', (d.contam||[]).join(', ')],
+    ['Anomalies', (d.anom||[]).join(', ')],
+    ['Commentaires', d.com||d.acom],
+  ].filter(r=>r[1]&&r[1]!=='');
+
+  return `<div style="margin-bottom:18px;page-break-inside:avoid">
+    <div style="background:${color};color:#fff;padding:7px 12px;border-radius:6px 6px 0 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">${label}</div>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #e0e0e0;border-top:none">
+      ${rows.map((r,i)=>`<tr style="background:${i%2===0?'#fff':'#f9f8f6'}">
+        <td style="padding:5px 10px;font-size:11px;color:#888;font-weight:600;width:40%;border-bottom:1px solid #f0f0f0">${r[0]}</td>
+        <td style="padding:5px 10px;font-size:12px;color:#1a1a1a;border-bottom:1px solid #f0f0f0">${r[1]}</td>
+      </tr>`).join('')}
+    </table>
+    ${photoArr&&photoArr.length?`<div style="border:1px solid #e0e0e0;border-top:none;padding:10px;background:#fafafa">
+      <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Photos (${photoArr.length})</div>
+      ${mkPhotoGrid(photoArr)}
+    </div>`:''}
+  </div>`;
+}
+
+function genPDF(){
+  const ici=ICI_LIST.find(i=>String(i.no)===cur);
+  const d=getD(cur);
+  const inf=d.infos||{},rec=d.rec||{},comp=d.comp||{},dech=d.dech||{},cmr=d.cmr||{},p=cmr.pesees||{};
+  const tot=CMR_CATS.reduce((s,c)=>s+(p[c]||0),0);
+
+  const recPhotos=(d.rec&&d.rec._photos)||photos.rec||[];
+  const compPhotos=(d.comp&&d.comp._photos)||photos.comp||[];
+  const dechPhotos=(d.dech&&d.dech._photos)||photos.dech||[];
+  const cmrPhotos=(d.cmr&&d.cmr._photos)||photos.cmr||[];
+
+  let tableRows=CMR_CATS.map((c,i)=>`
+    <tr style="background:${i%2===0?'#fff':'#f9f8f6'}">
+      <td style="padding:5px 10px;font-size:11px;border-bottom:1px solid #f0f0f0">${CMR_LABELS[i]}</td>
+      <td style="text-align:right;padding:5px 10px;font-family:monospace;font-size:12px;border-bottom:1px solid #f0f0f0">${fmt(p[c]||0)} kg</td>
+      <td style="text-align:right;padding:5px 10px;font-family:monospace;font-size:12px;border-bottom:1px solid #f0f0f0">${tot>0?fmt((p[c]||0)/tot*100)+' %':'—'}</td>
+    </tr>`).join('');
+
+  const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+  <title>Fiche — ${ici?ici.nom:cur}</title>
+  <style>
+    body{font-family:'Helvetica Neue',Arial,sans-serif;margin:0;padding:22px 26px;color:#1a1a1a;font-size:13px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .hdr{border-bottom:3px solid #1B6B2E;padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-end}
+    h1{font-size:19px;font-weight:800;margin:0;letter-spacing:-.02em}
+    .badge{font-family:monospace;font-size:11px;font-weight:700;background:#1a1a1a;color:#fff;padding:3px 10px;border-radius:20px}
+    .ig{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+    .ib{background:#f6f5f1;border-radius:6px;padding:8px 11px}
+    .ib .lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#888;font-weight:700}
+    .ib .val{font-size:12px;margin-top:2px;font-weight:600}
+    .ib.w{grid-column:1/-1}
+    .sh{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#888;margin:14px 0 8px;border-bottom:1px solid #eee;padding-bottom:4px}
+    table{width:100%;border-collapse:collapse}
+    .res{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px}
+    .rb{background:#f6f5f1;border-radius:6px;padding:8px 12px;text-align:center}
+    .rv{font-size:15px;font-weight:700;color:#1B6B2E;font-family:monospace}
+    .rl{font-size:10px;color:#888;margin-top:2px}
+    @media print{body{padding:14px}@page{margin:1cm;size:A4}}
+  </style></head><body>
+  <div class="hdr">
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:3px">Fiche de caractérisation — Matières résiduelles</div>
+      <h1>${ici?ici.nom:'—'}</h1>
+    </div>
+    <div class="badge">No ${ici?ici.no:cur}</div>
+  </div>
+
+  <div class="ig">
+    <div class="ib"><div class="lbl">Date</div><div class="val">${inf.date||'—'}</div></div>
+    <div class="ib"><div class="lbl">Heure</div><div class="val">${inf.heure||'—'}</div></div>
+    <div class="ib"><div class="lbl">Conteneur partagé</div><div class="val">${inf.partage||'—'}</div></div>
+    <div class="ib w"><div class="lbl">Adresse</div><div class="val">${ici?ici.adresse:'—'}</div></div>
+    <div class="ib"><div class="lbl">Quartier</div><div class="val">${ici?ici.quartier:'—'}</div></div>
+    <div class="ib"><div class="lbl">Type</div><div class="val">${ici?ici.type||'—':'—'}</div></div>
+    <div class="ib"><div class="lbl">Total pesé</div><div class="val" style="font-family:monospace;color:#1B6B2E">${fmt(tot)} kg</div></div>
+  </div>
+
+  ${inf.obs?`<div class="ib" style="margin-bottom:12px"><div class="lbl">Observations générales</div><div class="val" style="font-weight:400">${inf.obs}</div></div>`:''}
+
+  ${mkAuditSection('Audit visuel — Recyclage','#1A5FA8',rec,recPhotos)}
+  ${mkAuditSection('Audit visuel — Compost','#2E7D32',comp,compPhotos)}
+  ${mkAuditSection('Audit visuel — Déchets','#C84B2F',dech,dechPhotos)}
+
+  <div class="sh">CMR — Grille de tri des matières</div>
+  <table style="border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;margin-bottom:8px">
+    <thead><tr>
+      <th style="background:#1a1a1a;color:#fff;padding:7px 10px;font-size:11px;font-weight:700;text-align:left">Catégorie</th>
+      <th style="background:#1B6B2E;color:#fff;padding:7px 10px;font-size:11px;font-weight:700;text-align:right">Poids (kg)</th>
+      <th style="background:#1B6B2E;color:#fff;padding:7px 10px;font-size:11px;font-weight:700;text-align:right">%</th>
+    </tr></thead>
+    <tbody>${tableRows}</tbody>
+    <tfoot><tr>
+      <td style="background:#f0efe9;border-top:2px solid #1a1a1a;font-weight:700;padding:7px 10px;font-size:12px">Total général</td>
+      <td style="background:#f0efe9;border-top:2px solid #1a1a1a;font-weight:700;padding:7px 10px;font-size:12px;text-align:right;font-family:monospace">${fmt(tot)} kg</td>
+      <td style="background:#f0efe9;border-top:2px solid #1a1a1a;font-weight:700;padding:7px 10px;font-size:12px;text-align:right">100 %</td>
+    </tr></tfoot>
+  </table>
+
+  <div class="res">
+    <div class="rb"><div class="rv">${cmr.tcont||'—'}</div><div class="rl">Taux de contamination</div></div>
+    <div class="rb"><div class="rv">${cmr.trec||'—'}</div><div class="rl">Taux de récupération potentiel</div></div>
+    ${cmr.sacs?`<div class="rb"><div class="rv">${cmr.sacs}</div><div class="rl">Nombre de sacs</div></div>`:''}
+    ${cmr.bacs?`<div class="rb"><div class="rv">${cmr.bacs}</div><div class="rl">Nombre de bacs</div></div>`:''}
+  </div>
+
+  ${(cmr.anom&&cmr.anom.length)?`<div style="margin-top:10px;font-size:12px;color:#B71C1C;background:#FFEBEE;border-radius:6px;padding:8px 12px">⚠ Anomalies : ${cmr.anom.join(', ')}</div>`:''}
+  ${cmr.acom?`<div style="margin-top:8px;font-size:12px;color:#555;background:#f6f5f1;border-radius:6px;padding:8px 12px">${cmr.acom}</div>`:''}
+
+  ${cmrPhotos.length?`<div style="margin-top:14px;page-break-inside:avoid">
+    <div style="font-size:10px;font-weight:700;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #eee;padding-bottom:4px">Photos CMR (${cmrPhotos.length})</div>
+    ${mkPhotoGrid(cmrPhotos)}
+  </div>`:''}
+
+  <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`;
+
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+  else alert('Autorisez les popups pour générer le PDF.');
+}
+
+
+const ICI_LIST = [
+  {
+    "no": 2,
+    "nom": "P.Richard et Fortier",
+    "matricule": "Églises 3389",
+    "adresse": "3389 Églises, Lévis",
+    "quartier": "Charny",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 3,
+    "nom": "Le Sélection Lévis - résidence de personnes âgées 2",
+    "matricule": "Alphonse-Desjardins 1111",
+    "adresse": "1111 Alphonse-Desjardins, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 4,
+    "nom": "Église Saint-Antoine-de-Bienville",
+    "matricule": "Bienville 11",
+    "adresse": "11 Bienville, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 5,
+    "nom": "La Rose Des Vents Lévis Inc.",
+    "matricule": "Chaminade 300",
+    "adresse": "300 Chaminade, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 6,
+    "nom": "Résidence Les Marronniers 1 / Résidence Les Marronniers 5",
+    "matricule": "Charles-Édouard 22",
+    "adresse": "22 Charles-Édouard, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 7,
+    "nom": "Maison Louise-Élisabeth",
+    "matricule": "Entente 3",
+    "adresse": "3 Entente, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 8,
+    "nom": "Résidence Notre-Dame",
+    "matricule": "Fraser 6212",
+    "adresse": "6212 Fraser, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 9,
+    "nom": "Aux trois tartines",
+    "matricule": "Guillaume-Couture 5751-5755",
+    "adresse": "5751-5755 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 10,
+    "nom": "Nettoyeur Lecours Inc",
+    "matricule": "Guillaume-Couture 7070",
+    "adresse": "7070 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 11,
+    "nom": "Résidence La Chambrière 1 / Résidence La Chambrière 2",
+    "matricule": "Monseigneur-Bourget 4",
+    "adresse": "4 Monseigneur-Bourget, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 12,
+    "nom": "Pavillon Bellevue Inc",
+    "matricule": "Monseigneur-Bourget 99",
+    "adresse": "99 Monseigneur-Bourget, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 13,
+    "nom": "Jean Kristin / Coopérative de solidarité d'habitations Le Mieux-Vivre 2 / Coopérative de solidarité d'habitations Le Mieux-Vivre 1",
+    "matricule": "Guillaume-Couture 8122-8150",
+    "adresse": "8122-8150 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 19,
+    "nom": "Matelas Dauphin",
+    "matricule": "Générations 5257",
+    "adresse": "5257 Générations, Lévis",
+    "quartier": "Charny",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 15,
+    "nom": "Recyclage Lévis",
+    "matricule": "Gravel 2885",
+    "adresse": "2885 Gravel, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 16,
+    "nom": "Pavillon d'hébergement Beauséjour - Résidence pour retraités",
+    "matricule": "Guillaume-Couture 2240",
+    "adresse": "2240 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 17,
+    "nom": "Dépanneur Dany",
+    "matricule": "Sault 1600",
+    "adresse": "1600 Sault, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 18,
+    "nom": "Résidence Le Conf'Or",
+    "matricule": "Saint-Rédempteur 74",
+    "adresse": "74 Saint-Rédempteur, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 20,
+    "nom": "Sanimax",
+    "matricule": "Rotonde 2001",
+    "adresse": "2001 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 21,
+    "nom": "BGR scies 1 / BGR scies 2",
+    "matricule": "Rotonde 2341",
+    "adresse": "2341 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 53,
+    "nom": "Place Charny / Place Charny 2 / Place Charny 1",
+    "matricule": "Églises 8032",
+    "adresse": "8032 Églises, Lévis",
+    "quartier": "Charny",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 22,
+    "nom": "Olympus NDT Mécanique-Systèmes",
+    "matricule": "Archimède 864",
+    "adresse": "864 Archimède, Lévis",
+    "quartier": "Lévis",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 23,
+    "nom": "Frito-Lay de Lévis",
+    "matricule": "Guillaume-Couture 8450",
+    "adresse": "8450 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 24,
+    "nom": "Dracon",
+    "matricule": "Riveurs 1674",
+    "adresse": "1674 Riveurs, Lévis",
+    "quartier": "Lévis",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 25,
+    "nom": "Protech",
+    "matricule": "Émeraudes 6",
+    "adresse": "6 Émeraudes, Lévis",
+    "quartier": "Lévis",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 62,
+    "nom": "Sobey's Gaz",
+    "matricule": "Président-Kennedy 200",
+    "adresse": "200 Président-Kennedy, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 63,
+    "nom": "Ultramar; Groupe commercial AMT 2 / Ultramar; Groupe commercial AMT 1",
+    "matricule": "Alphonse-Desjardins 1655",
+    "adresse": "1655 Alphonse-Desjardins, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 64,
+    "nom": "Dollarama",
+    "matricule": "Caron 141",
+    "adresse": "141 Caron, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 149,
+    "nom": "Grenier Comptoir Alimentaire",
+    "matricule": "Christ-Roi 491",
+    "adresse": "491 Christ-Roi, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 54,
+    "nom": "Francis Dumont / Sincpor inc",
+    "matricule": "Archimède 867-869",
+    "adresse": "867-869 Archimède, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 55,
+    "nom": "Comptoir des Infortunés 2 / Comptoir des Infortunés 1",
+    "matricule": "Fortier 41",
+    "adresse": "41 Fortier, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 56,
+    "nom": "LR Tech inc.",
+    "matricule": "Guillaume-Couture 3945",
+    "adresse": "3945 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 57,
+    "nom": "NAPA Pièces d'auto - Pièces d'auto GGM inc.",
+    "matricule": "Guillaume-Couture 4345",
+    "adresse": "4345 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 26,
+    "nom": "Les Industries NorJac Inc",
+    "matricule": "Ferblantier 815",
+    "adresse": "815 Ferblantier, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 35,
+    "nom": "Ébénisterie Breton inc.",
+    "matricule": "1re avenue 520",
+    "adresse": "520 1re avenue, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 36,
+    "nom": "Silo Superieur Inc",
+    "matricule": "2e avenue 520",
+    "adresse": "2e avenue 520 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 27,
+    "nom": "Ramp-Art",
+    "matricule": "Ferblantier 925",
+    "adresse": "925 Ferblantier, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 38,
+    "nom": "Boulons et Écrous A.M. inc.",
+    "matricule": "5e rue 2173",
+    "adresse": "5e rue 2173 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 39,
+    "nom": "Gare de train Charny - VIA Rail",
+    "matricule": "Gare 2326",
+    "adresse": "2326 Gare, Lévis",
+    "quartier": "Charny",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 40,
+    "nom": "Autobus Inter-Rive Inc / Marché aux puces Chez Dyno",
+    "matricule": "Maréchal-Joffre 5336-5348",
+    "adresse": "5336-5348 Maréchal-Joffre, Lévis",
+    "quartier": "Charny",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 41,
+    "nom": "Gingras immo",
+    "matricule": "Rotonde 2274",
+    "adresse": "2274 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 42,
+    "nom": "Robert Létourneau Transport Général Enr",
+    "matricule": "Calfats 825",
+    "adresse": "825 Calfats, Lévis",
+    "quartier": "Lévis",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 28,
+    "nom": "Optimétal 360 Inc.",
+    "matricule": "Maréchal 325",
+    "adresse": "325 Maréchal, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 29,
+    "nom": "Melabois Meubles",
+    "matricule": "Président-Kennedy 675",
+    "adresse": "675 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 43,
+    "nom": "Récumax Inc",
+    "matricule": "Maréchal 318",
+    "adresse": "318 Maréchal, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 58,
+    "nom": "Serrupro",
+    "matricule": "Guillaume-Couture 4555-4579",
+    "adresse": "4555-4579 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 47,
+    "nom": "Transport Y N Gonthier Inc",
+    "matricule": "3e rue 2170",
+    "adresse": "3e rue 2170 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 48,
+    "nom": "SDC",
+    "matricule": "Centre-Hospitalier 8093",
+    "adresse": "8093 Centre-Hospitalier, Lévis",
+    "quartier": "Charny",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 49,
+    "nom": "Automobile Patrick April / Transmission Rive Sud Inc",
+    "matricule": "Charny 2192",
+    "adresse": "2192 Charny, Lévis",
+    "quartier": "Charny",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 50,
+    "nom": "Restaurant An-Nam Délices",
+    "matricule": "Charny 2505-2513",
+    "adresse": "2505-2513 Charny, Lévis",
+    "quartier": "Charny",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 51,
+    "nom": "Merrill Allard produit pétrolier",
+    "matricule": "Rotonde 2309",
+    "adresse": "2309 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 52,
+    "nom": "Bar Billard Regi",
+    "matricule": "Églises 3273-3277",
+    "adresse": "3273-3277 Églises, Lévis",
+    "quartier": "Charny",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 44,
+    "nom": "Kingsway Vrac 3 / Kingsway Vrac 1 / Kingsway Vrac 2",
+    "matricule": "Président-Kennedy 570",
+    "adresse": "570 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 59,
+    "nom": "Défi-Évasion Lévis / Jeux d'évasion à Lévis",
+    "matricule": "Guillaume-Couture 4683-4689",
+    "adresse": "4683-4689 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 60,
+    "nom": "PJC Jean Coutu / Clinique d'Ophtalmologie de Lévis - Polyclinique Medicale Rive-Sud",
+    "matricule": "Guillaume-Couture 4955-4975",
+    "adresse": "4955-4975 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 61,
+    "nom": "Macpek / Ébénisterie spécialisée G.L.",
+    "matricule": "Émeraudes 5",
+    "adresse": "5 Émeraudes, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 134,
+    "nom": "École Desjardins",
+    "matricule": "Fabrique 3700",
+    "adresse": "3700 Fabrique, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 135,
+    "nom": "Point S - Pneus Ratté Lévis",
+    "matricule": "Guillaume-Couture 3880",
+    "adresse": "3880 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 136,
+    "nom": "Place Émeraude / Industrielle Alliance (IA)",
+    "matricule": "Guillaume-Couture 4060",
+    "adresse": "4060 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 137,
+    "nom": "Juneau et frère",
+    "matricule": "Guillaume-Couture 4825-4827",
+    "adresse": "4825-4827 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 138,
+    "nom": "Creaform",
+    "matricule": "Pascaline 4700",
+    "adresse": "4700 Pascaline, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 45,
+    "nom": "Transport Multivrac - Centre de Vrac",
+    "matricule": "Président-Kennedy 640",
+    "adresse": "640 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 69,
+    "nom": "Isolation Hallé & Mailloux inc.",
+    "matricule": "Ferblantier 900",
+    "adresse": "900 Ferblantier, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 70,
+    "nom": "Oxygaz - Air Liquide - Miller Electric",
+    "matricule": "Ferblantier 957",
+    "adresse": "957 Ferblantier, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 65,
+    "nom": "Centre intégré de santé & de sevices sociaux 1 / Centre intégré de santé & de sevices sociaux 2",
+    "matricule": "Wolfe 160",
+    "adresse": "160 Wolfe, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 66,
+    "nom": "Walmart",
+    "matricule": "Alphonse-Desjardins 1200",
+    "adresse": "1200 Alphonse-Desjardins, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 67,
+    "nom": "Restaurant Levina",
+    "matricule": "Bégin 10",
+    "adresse": "10 Bégin, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 68,
+    "nom": "Dollorama",
+    "matricule": "Président-Kennedy 51",
+    "adresse": "51 Président-Kennedy, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 71,
+    "nom": "Body Gym Equipement",
+    "matricule": "Pintendre 801",
+    "adresse": "801 Pintendre, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 72,
+    "nom": "Électro 5 Inc.",
+    "matricule": "Président-Kennedy 522",
+    "adresse": "522 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 73,
+    "nom": "Larry Autos Caravanes Inc",
+    "matricule": "Président-Kennedy 530",
+    "adresse": "530 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 74,
+    "nom": "Couche-Tard",
+    "matricule": "Président-Kennedy 580",
+    "adresse": "580 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 75,
+    "nom": "Le Groupe Neurones Inc",
+    "matricule": "Président-Kennedy 584",
+    "adresse": "584 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 76,
+    "nom": "Toyotech inc. / Transbro Inc.",
+    "matricule": "Président-Kennedy 599",
+    "adresse": "599 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 77,
+    "nom": "Entreprise EGB",
+    "matricule": "Président-Kennedy 609",
+    "adresse": "609 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 78,
+    "nom": "Gestion Paré Picard inc",
+    "matricule": "Président-Kennedy 614",
+    "adresse": "614 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 79,
+    "nom": "Immeubles Henryvon inc. 2",
+    "matricule": "Président-Kennedy 622-626",
+    "adresse": "622-626 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 80,
+    "nom": "Proxi",
+    "matricule": "Président-Kennedy 659",
+    "adresse": "659 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 81,
+    "nom": "Tim Hortons",
+    "matricule": "Président-Kennedy 725",
+    "adresse": "725 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 82,
+    "nom": "Decorasol - Cuisine & salle de bain - Benjamin Moore",
+    "matricule": "Président-Kennedy 779",
+    "adresse": "779 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 83,
+    "nom": "Station de Service Léopold Fortin Inc",
+    "matricule": "Président-Kennedy 805",
+    "adresse": "805 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 84,
+    "nom": "Service D'Entretien Teronet Inc",
+    "matricule": "Président-Kennedy 828",
+    "adresse": "828 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 85,
+    "nom": "Solu Pièces",
+    "matricule": "Président-Kennedy 986",
+    "adresse": "986 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 86,
+    "nom": "Dépanneur Lysetet",
+    "matricule": "Ruisseaux 354",
+    "adresse": "354 Ruisseaux, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 155,
+    "nom": "Williams Scotsman du Canada 2 / Williams Scotsman du Canada 1",
+    "matricule": "Maréchal 297",
+    "adresse": "297 Maréchal, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 156,
+    "nom": "Construction Richard Blais",
+    "matricule": "Maréchal 330",
+    "adresse": "330 Maréchal, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 87,
+    "nom": "Les Distributions Carl Beaulac inc.",
+    "matricule": "Monseigneur-Bourget 970",
+    "adresse": "970 Monseigneur-Bourget, Lévis",
+    "quartier": "Saint-Joseph-de-la-Pointe-De-Lévy",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 88,
+    "nom": "Équipement Martin Inc.",
+    "matricule": "Monseigneur-Bourget 980",
+    "adresse": "980 Monseigneur-Bourget, Lévis",
+    "quartier": "Saint-Joseph-de-la-Pointe-De-Lévy",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 203,
+    "nom": "Véolia 1 / Véolia 3 / Onyx Industries / Véolia 2 / ...",
+    "matricule": "Etchemin 2800",
+    "adresse": "2800 Etchemin, Lévis",
+    "quartier": "Lévis",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 204,
+    "nom": "IGA Lévis / Subway 2 / Subway / Familiprix / ...",
+    "matricule": "Guillaume-Couture 3950-3990",
+    "adresse": "3950-3990 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 205,
+    "nom": "Imafa",
+    "matricule": "Guillaume-Couture 4495-4497",
+    "adresse": "4495-4497 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 217,
+    "nom": "Magasin général- Textile / Centre Raymond-Blais",
+    "matricule": "Raymond-Blais 4-6",
+    "adresse": "4-6 Raymond-Blais, Lévis",
+    "quartier": "Lévis",
+    "groupe": "7",
+    "type": "Culturelle, récréative et loisirs"
+  },
+  {
+    "no": 30,
+    "nom": "Control Skateboard Inc",
+    "matricule": "Alphonse-Desrochers 857",
+    "adresse": "857 Alphonse-Desrochers, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 31,
+    "nom": "Les Entreprises DCL / Styl Cabinets Inc.",
+    "matricule": "J.-Ambroise-Craig 810",
+    "adresse": "810 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 32,
+    "nom": "Transfab Energie Inc",
+    "matricule": "Olivier 760",
+    "adresse": "760 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 157,
+    "nom": "New Alta",
+    "matricule": "Maréchal 340",
+    "adresse": "340 Maréchal, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 158,
+    "nom": "École des Moussaillons",
+    "matricule": "Pintendre 807",
+    "adresse": "807 Pintendre, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 159,
+    "nom": "Point S City - Auto Techno 2 / Point S City - Auto Techno 1",
+    "matricule": "Président-Kennedy 559",
+    "adresse": "559 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 160,
+    "nom": "Gestion Norayco inc.",
+    "matricule": "Président-Kennedy 560",
+    "adresse": "560 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 161,
+    "nom": "Bergedac Ltée",
+    "matricule": "Président-Kennedy 590",
+    "adresse": "590 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 162,
+    "nom": "Poly-Mag",
+    "matricule": "Président-Kennedy 623",
+    "adresse": "623 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 163,
+    "nom": "Centre du camion",
+    "matricule": "Président-Kennedy 645",
+    "adresse": "645 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 164,
+    "nom": "Pavage Audet inc.",
+    "matricule": "Président-Kennedy 648",
+    "adresse": "648 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 165,
+    "nom": "Image Express",
+    "matricule": "Président-Kennedy 651",
+    "adresse": "651 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 105,
+    "nom": "Le Carrossier Rive-Sud Inc.",
+    "matricule": "1re avenue 420",
+    "adresse": "1re avenue 420 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 106,
+    "nom": "Hewsaw Machines Inc",
+    "matricule": "2e avenue 545",
+    "adresse": "2e avenue 545 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 107,
+    "nom": "Déneigement Normand Cliche",
+    "matricule": "3e avenue 550",
+    "adresse": "3e avenue 550 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 166,
+    "nom": "Frein Embrayage Kennedy Inc",
+    "matricule": "Président-Kennedy 658",
+    "adresse": "658 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 167,
+    "nom": "Construction Dutran",
+    "matricule": "Président-Kennedy 685",
+    "adresse": "685 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 168,
+    "nom": "Meubles De La Rive-Sud",
+    "matricule": "Président-Kennedy 689",
+    "adresse": "689 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 111,
+    "nom": "Motel Etchemin",
+    "matricule": "Guillaume-Couture 2774",
+    "adresse": "2774 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 112,
+    "nom": "Essence+ de Canadian Tire",
+    "matricule": "Guillaume-Couture 910",
+    "adresse": "910 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 169,
+    "nom": "Garderie L'Odyssée du Papillon",
+    "matricule": "Président-Kennedy 691",
+    "adresse": "691 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 170,
+    "nom": "Clinique dentaire Jean-François Cloutier",
+    "matricule": "Président-Kennedy 700",
+    "adresse": "700 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 33,
+    "nom": "Abrasifs JJS Inc  1 / Abrasifs JJS Inc  2",
+    "matricule": "Olivier 900",
+    "adresse": "900 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 171,
+    "nom": "Garage Gaudreau J & R Inc",
+    "matricule": "Président-Kennedy 752",
+    "adresse": "752 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 172,
+    "nom": "JDHM",
+    "matricule": "Président-Kennedy 777",
+    "adresse": "777 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 173,
+    "nom": "Édifice Le Président",
+    "matricule": "Président-Kennedy 784",
+    "adresse": "784 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 174,
+    "nom": "Dépanneur Le Président",
+    "matricule": "Président-Kennedy 786",
+    "adresse": "786 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 175,
+    "nom": "Pintendre autos",
+    "matricule": "Président-Kennedy 795",
+    "adresse": "795 Président-Kennedy, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 195,
+    "nom": "Énergie Cardio",
+    "matricule": "Aubert 345",
+    "adresse": "345 Aubert, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "7",
+    "type": "Culturelle, récréative et loisirs"
+  },
+  {
+    "no": 122,
+    "nom": "CPE Pierrot & Colombine Inc",
+    "matricule": "Centre-Hospitalier 9343",
+    "adresse": "9343 Centre-Hospitalier, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 123,
+    "nom": "Construction Edmond Nolin Ltée",
+    "matricule": "Quartier-d'Antan 2289",
+    "adresse": "2289 Quartier-d'Antan, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 124,
+    "nom": "Baron Multi-Services",
+    "matricule": "Quartier-d'Antan 2319",
+    "adresse": "2319 Quartier-d'Antan, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 125,
+    "nom": "Excavation Roberge et Fils inc",
+    "matricule": "Rotonde 2324",
+    "adresse": "2324 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 126,
+    "nom": "Jean-Marie Breton plomberie",
+    "matricule": "Rotonde 2332",
+    "adresse": "2332 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 127,
+    "nom": "Soudure Mobile L B",
+    "matricule": "Rotonde 2374",
+    "adresse": "2374 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 128,
+    "nom": "Dek hockey",
+    "matricule": "Rotonde 2388",
+    "adresse": "2388 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 129,
+    "nom": "Garage Olivier Leclerc",
+    "matricule": "Rotonde 2436",
+    "adresse": "2436 Rotonde, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 130,
+    "nom": "Consultants Lemay & Choinière Inc.",
+    "matricule": "Sous-le-Vent 8278",
+    "adresse": "8278 Sous-le-Vent, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 131,
+    "nom": "Ville de Lévis",
+    "matricule": "Symphonie 5371-5377",
+    "adresse": "5371-5377 Symphonie, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 132,
+    "nom": "Presbytère",
+    "matricule": "Église 3328",
+    "adresse": "3328 Église, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 133,
+    "nom": "NAPA AUTOPRO - Charny Auto-Technic Inc",
+    "matricule": "Églises 3693",
+    "adresse": "3693 Églises, Lévis",
+    "quartier": "Charny",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 46,
+    "nom": "Kenworth Maska - Lévis",
+    "matricule": "Olivier 800-810",
+    "adresse": "800-810 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "4",
+    "type": "Transports, communications et services publics"
+  },
+  {
+    "no": 89,
+    "nom": "Ciba (Cominar)",
+    "matricule": "J.-Ambroise-Craig 795",
+    "adresse": "795 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 90,
+    "nom": "Toitures des 2 Rives Inc / Camions & Remorques Protech Inc",
+    "matricule": "J.-Ambroise-Craig 819",
+    "adresse": "819 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 91,
+    "nom": "Québec Entrepôt",
+    "matricule": "J.-Ambroise-Craig 854-864",
+    "adresse": "854-864 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 92,
+    "nom": "Place Saint-Nicolas 1 / Demeter Services Vétérinaires Inc 3 / Place Saint-Nicolas 2 / ...",
+    "matricule": "Marie-Victorin 845",
+    "adresse": "845 Marie-Victorin, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 139,
+    "nom": "Cimetière Mont-Marie",
+    "matricule": "Mont-Marie 154",
+    "adresse": "154 Mont-Marie, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 140,
+    "nom": "Collège de Lévis 2",
+    "matricule": "Mont-Marie 51-59",
+    "adresse": "51-59 Mont-Marie, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 141,
+    "nom": "Élec. Gaston Bélange",
+    "matricule": "Riveurs 1350",
+    "adresse": "1350 Riveurs, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 142,
+    "nom": "Édifice Saint-Georges",
+    "matricule": "Saint-Georges 5935",
+    "adresse": "5935 Saint-Georges, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 143,
+    "nom": "Centre de services ambulatoires en pédopsychiatrie de Lévis",
+    "matricule": "Saint-Georges 6530-6560",
+    "adresse": "6530-6560 Saint-Georges, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 144,
+    "nom": "Église Saint-Joseph",
+    "matricule": "Saint-Joseph 291",
+    "adresse": "291 Saint-Joseph, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 145,
+    "nom": "Couvent De Jésus-Marie",
+    "matricule": "Saint-Joseph 294",
+    "adresse": "294 Saint-Joseph, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 146,
+    "nom": "Textile Ouest-Est",
+    "matricule": "Saint-Joseph 416",
+    "adresse": "416 Saint-Joseph, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 147,
+    "nom": "École Du Ruisseau",
+    "matricule": "Saint-Joseph 688",
+    "adresse": "688 Saint-Joseph, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 148,
+    "nom": "Excavations Lafontaine Inc 1 / Excavations Lafontaine Inc 2",
+    "matricule": "Archimède 872",
+    "adresse": "872 Archimède, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 207,
+    "nom": "IMAFA",
+    "matricule": "Ferblantier 801",
+    "adresse": "801 Ferblantier, Lévis",
+    "quartier": "Pintendre",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 150,
+    "nom": "Construction Raoul Pelletier",
+    "matricule": "Guillaume-Couture 3650",
+    "adresse": "3650 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 151,
+    "nom": "Antirouille Métropolitain | Lévis",
+    "matricule": "Guillaume-Couture 3760",
+    "adresse": "3760 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 152,
+    "nom": "Centre de mécanique Lévis Inc Auto Mécano",
+    "matricule": "Guillaume-Couture 4460",
+    "adresse": "4460 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 153,
+    "nom": "Vitrerie Global 2 / Vitrerie Global 1 / Vitrerie Global 3",
+    "matricule": "Passage 132-136",
+    "adresse": "132-136 Passage, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 154,
+    "nom": "Postes Canada",
+    "matricule": "Saint-Laurent 5935-5955",
+    "adresse": "5935-5955 Saint-Laurent, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 202,
+    "nom": "Maison des Aînés St-Étienne / Maison des aînés et alternative de Lévis à Saint-Étienne-de-Lauzon 1 / Maison des aînés et alternative de Lévis à Saint-Étienne-de-Lauzon",
+    "matricule": "Albert-Rousseau 540",
+    "adresse": "540 Albert-Rousseau, Lévis",
+    "quartier": "Saint-Étienne-de-Lauzon",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 14,
+    "nom": "Château Bellevue",
+    "matricule": "Rivières 1260",
+    "adresse": "1260 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "1",
+    "type": "Résidentielle"
+  },
+  {
+    "no": 34,
+    "nom": "Béton Chevalier Inc",
+    "matricule": "J.-B.-Renaud 1179",
+    "adresse": "1179 J.-B.-Renaud, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 96,
+    "nom": "Hôtel & Suites Normandin Lévis",
+    "matricule": "Bernières 511-535",
+    "adresse": "511-535 Bernières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 97,
+    "nom": "Volkswagen Saint-Nicolas",
+    "matricule": "Bernières 770",
+    "adresse": "770 Bernières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 98,
+    "nom": "Fromagerie Victoria Saint-Nicolas 2 / Fromagerie Victoria Saint-Nicolas 1",
+    "matricule": "Lagueux 1795",
+    "adresse": "1795 Lagueux, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 99,
+    "nom": "McDonald’s / Dépanneur & Station-service Ultramar 1 / McDonald’s / Dépanneur & Station-service Ultramar 2",
+    "matricule": "Marie-Victorin 390",
+    "adresse": "390 Marie-Victorin, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 100,
+    "nom": "Ultramar - Station-service 2 / McDonald's",
+    "matricule": "Olivier 1204-1224",
+    "adresse": "1204-1224 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 101,
+    "nom": "Petro-Canada / A&W 2 / Petro-Canada / A&W 1",
+    "matricule": "Olivier 1230",
+    "adresse": "1230 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 102,
+    "nom": "Brunet/ Eggsqui/SAQ 2 / Brunet/ Eggsqui/SAQ 1 / PFK / ...",
+    "matricule": "Rivières 1365",
+    "adresse": "1365 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 103,
+    "nom": "Days In Hotel (Oiselière)",
+    "matricule": "Rivières 1710",
+    "adresse": "1710 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 104,
+    "nom": "J. Coutu-Dollorama-Clin. Méd. 1 / J. Coutu-Dollorama-Clin. Méd. 2 / Dollorama-SQDC 1 / ...",
+    "matricule": "Rivières 1855",
+    "adresse": "1855 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 185,
+    "nom": "Complexe Medway",
+    "matricule": "Rivières 770",
+    "adresse": "770 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 196,
+    "nom": "Halte de la Chaudière-Appalaches",
+    "matricule": "Jean-Lesage 800",
+    "adresse": "800 Jean-Lesage, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "7",
+    "type": "Culturelle, récréative et loisirs"
+  },
+  {
+    "no": 197,
+    "nom": "Productions horticoles Demers",
+    "matricule": "Frédéric-Méthot 1041",
+    "adresse": "1041 Frédéric-Méthot, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "8",
+    "type": "Production et extraction de richesses naturelles"
+  },
+  {
+    "no": 209,
+    "nom": "Ultramar / Restaurant Normandin 1 / Restaurant Normandin 2",
+    "matricule": "Rivières 1505",
+    "adresse": "1505 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 116,
+    "nom": "Dépanneur Chez-Phil / Coiffure K I",
+    "matricule": "Chaudière 1336",
+    "adresse": "1336 Chaudière, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 117,
+    "nom": "Body Gym équipements",
+    "matricule": "Frênes 1404",
+    "adresse": "1404 Frênes, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 118,
+    "nom": "Centre commercial 2 / Centre commercial 1",
+    "matricule": "Rivières 2170",
+    "adresse": "2170 Rivières, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 119,
+    "nom": "Dépanneur Irving",
+    "matricule": "Rivières 2201",
+    "adresse": "2201 Rivières, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 120,
+    "nom": "Croteau",
+    "matricule": "Rivières 2204",
+    "adresse": "2204 Rivières, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 93,
+    "nom": "Manac",
+    "matricule": "Olivier 750",
+    "adresse": "750 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 94,
+    "nom": "LE GEANT MOTORISÉ INC.",
+    "matricule": "Olivier 780",
+    "adresse": "780 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 95,
+    "nom": "Alutrec / Bell Canada / Maskinen",
+    "matricule": "Olivier 820",
+    "adresse": "820 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 176,
+    "nom": "Peinture Industrielle 1 / Peinture Industrielle 2",
+    "matricule": "Alphonse-Desrochers 867",
+    "adresse": "867 Alphonse-Desrochers, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 177,
+    "nom": "LOU-TEC - St-Nicolas (Atelier mécanique)",
+    "matricule": "Briqueterie 779",
+    "adresse": "779 Briqueterie, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 178,
+    "nom": "TRI Immobilier",
+    "matricule": "J.-Ambroise-Craig 785",
+    "adresse": "785 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 179,
+    "nom": "Nordfroid",
+    "matricule": "J.-Ambroise-Craig 809",
+    "adresse": "809 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 180,
+    "nom": "TSE",
+    "matricule": "J.-Ambroise-Craig 814",
+    "adresse": "814 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 181,
+    "nom": "Kinetico Puribec 1",
+    "matricule": "Olivier 546",
+    "adresse": "546 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 121,
+    "nom": "Dépanneur EKO",
+    "matricule": "Rivières 2540",
+    "adresse": "2540 Rivières, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 186,
+    "nom": "Carrosier Rive-Sud auto",
+    "matricule": "1re avenue 440",
+    "adresse": "1re avenue 440 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 187,
+    "nom": "École la materia",
+    "matricule": "2e avenue 555",
+    "adresse": "2e avenue 555 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 188,
+    "nom": "CPE Petit Tambour",
+    "matricule": "Alphonse-Ouellet 2272",
+    "adresse": "2272 Alphonse-Ouellet, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 189,
+    "nom": "CSST",
+    "matricule": "Concorde 825-835",
+    "adresse": "825-835 Concorde, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 190,
+    "nom": "Complexe Pôle Sud 2 / Complexe Pôle Sud 1",
+    "matricule": "Courchevel 1190",
+    "adresse": "1190 Courchevel, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 191,
+    "nom": "NAPA AUTOPRO - Centre Mecanique Bolduc Inc.",
+    "matricule": "Guillaume-Couture 2245",
+    "adresse": "2245 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 192,
+    "nom": "Cimetière de Saint-Romuald",
+    "matricule": "Saint-Romuald 567",
+    "adresse": "567 Saint-Romuald, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 193,
+    "nom": "Centre des loisirs",
+    "matricule": "Grand-Tronc 95",
+    "adresse": "95 Grand-Tronc, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 194,
+    "nom": "Garderie Petits oursons",
+    "matricule": "Rivières 2535",
+    "adresse": "2535 Rivières, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 37,
+    "nom": "Supermétal Structures Inc. 3 / Supermétal Structures Inc. 5 / Supermétal Structures Inc. 2 / ...",
+    "matricule": "5e rue 1955",
+    "adresse": "5e rue 1955 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "2-3",
+    "type": "Industries manufacturières"
+  },
+  {
+    "no": 108,
+    "nom": "Entreprises Robert Côté Inc",
+    "matricule": "3e rue 2044",
+    "adresse": "3e rue 2044 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 109,
+    "nom": "SAQ Sélection-St-Romuald / IGA extra St-Romuald / Tim Hortons / ...",
+    "matricule": "Guillaume-Couture 1040-1070",
+    "adresse": "1040-1070 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 198,
+    "nom": "Globalvet - Clinique vétérinaire Lévis",
+    "matricule": "Guillaume-Couture 2865",
+    "adresse": "2865 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "8",
+    "type": "Production et extraction de richesses naturelles"
+  },
+  {
+    "no": 199,
+    "nom": "Pavillon Vien",
+    "matricule": "Saint-Antoine 3",
+    "adresse": "3 Saint-Antoine, Lévis",
+    "quartier": "Lévis",
+    "groupe": "9",
+    "type": "Immeubles non exploités et étendues d'eau"
+  },
+  {
+    "no": 182,
+    "nom": "Fardiers Québec",
+    "matricule": "Olivier 798",
+    "adresse": "798 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 201,
+    "nom": "Transmission St-Romuald",
+    "matricule": "Guillaume-Couture 1773-1783",
+    "adresse": "1773-1783 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "9",
+    "type": "Immeubles non exploités et étendues d'eau"
+  },
+  {
+    "no": 110,
+    "nom": "Les Délices d'Angkor / Les cartes sportives de la Capitale / Dollarama",
+    "matricule": "Guillaume-Couture 2130-2170",
+    "adresse": "2130-2170 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 183,
+    "nom": "Prévost 2 / Transport Grayson / Prévost 1",
+    "matricule": "Olivier 850",
+    "adresse": "850 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 184,
+    "nom": "École du Grand-Voilier / Pavillon des Hirondelles",
+    "matricule": "Pionniers 1438",
+    "adresse": "1438 Pionniers, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 200,
+    "nom": "Manitoulin",
+    "matricule": "Intercolonial 2700",
+    "adresse": "2700 Intercolonial, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "9",
+    "type": "Immeubles non exploités et étendues d'eau"
+  },
+  {
+    "no": 206,
+    "nom": "Poulet Royal (Groupe Mach) / Place Lévis (Maxi, Clinique Covid, Novaco, …) 1",
+    "matricule": "Président-Kennedy 50",
+    "adresse": "50 Président-Kennedy, Lévis",
+    "quartier": "Lévis",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 113,
+    "nom": "Entrepot Mini-Maxi Inc",
+    "matricule": "Saint-Romuald 850",
+    "adresse": "850 Saint-Romuald, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 208,
+    "nom": "Jean Coutu Audrey Blais & Vicky Gagnon / Sushi Deli SOCIETE IMMOBILIERE GP INC. / Poulet Rouge-Société Immobilière GP",
+    "matricule": "Marie-Victorin 430-450",
+    "adresse": "430-450 Marie-Victorin, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 114,
+    "nom": "Canac 4 / Canac 3 / Canac 1 / ...",
+    "matricule": "Taniata 370-376",
+    "adresse": "370-376 Taniata, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 210,
+    "nom": "Non documenté",
+    "matricule": "Guillaume-Couture 2301",
+    "adresse": "2301 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "5",
+    "type": "Commerciale"
+  },
+  {
+    "no": 211,
+    "nom": "Non documenté",
+    "matricule": "Gabarieurs 300",
+    "adresse": "300 Gabarieurs, Lévis",
+    "quartier": "Lévis",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 212,
+    "nom": "Lyneco / Construction Linéaire Inc.",
+    "matricule": "J.-Ambroise-Craig 789-799",
+    "adresse": "789-799 J.-Ambroise-Craig, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 213,
+    "nom": "Sierra Monde Inc. / Camions International Élite Ltée",
+    "matricule": "Olivier 1130",
+    "adresse": "1130 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 214,
+    "nom": "Groupe Beaudoin / Systemes D'Humidification Humijet",
+    "matricule": "Olivier 1170-1174",
+    "adresse": "1170-1174 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 215,
+    "nom": "Bibliothèque / Copropriété Vilieu + commerces",
+    "matricule": "Rivières 595-601",
+    "adresse": "595-601 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 216,
+    "nom": "Les Remorques G.L.B. Inc. / Gestion SRTF",
+    "matricule": "4e rue 2192-2198",
+    "adresse": "4e rue 2192-2198 , Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "6",
+    "type": "Services"
+  },
+  {
+    "no": 218,
+    "nom": "Les Productions horticoles Demers / Les serres Demers 1 / Les serres Demers 3 / ...",
+    "matricule": "Yvon-Beaudoin 1196",
+    "adresse": "1196 Yvon-Beaudoin, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "8",
+    "type": "Production et extraction de richesses naturelles"
+  },
+  {
+    "no": 115,
+    "nom": "Boucherie Délices",
+    "matricule": "Rivières 2149-2155",
+    "adresse": "2149-2155 Rivières, Lévis",
+    "quartier": "Saint-Rédempteur",
+    "groupe": "5",
+    "type": "Commerciale"
+  }
+];
+
+// INIT
+loadSheets();
+showDash();
+</script>
+</body>
+</html>
