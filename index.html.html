@@ -119,7 +119,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);background:var
     <div class="dc w"><div class="dn" id="d-inc">0</div><div class="dl">CMR incomplètes</div></div>
     <div class="dc e"><div class="dn" id="d-ano">0</div><div class="dl">Anomalies signalées</div></div>
   </div>
-  <button class="btn bp" onclick="showListe()">Voir les 217 sites ICI →</button>
+  <button class="btn bp" onclick="showListe()">Voir les 250 sites ICI →</button>
   <button class="btn bb" onclick="exportExcel()">⬇ Exporter Excel (toutes les données)</button>
   <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:-4px">Une ligne par bâtiment — toutes les sections</p>
 </div>
@@ -2867,7 +2867,305 @@ const ICI_LIST = [
     "quartier": "Saint-Rédempteur",
     "groupe": "5",
     "type": "Commerciale"
+  },
+  {
+    "no": 232,
+    "nom": "Garage Clément Fournier inc.(AutoPLACE) 1 / Garage Clément Fournier inc.(AutoPLACE) 2",
+    "matricule": "232",
+    "adresse": "4530-4560 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 233,
+    "nom": "Pelletier Déco Surfaces 2 / Pelletier Déco Surfaces 1 / Pelletier Déco Surfaces 3",
+    "matricule": "233",
+    "adresse": "4600 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 234,
+    "nom": "Trévi Lévis",
+    "matricule": "234",
+    "adresse": "4750 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 235,
+    "nom": "Floralies Jouvence",
+    "matricule": "235",
+    "adresse": "4760 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 236,
+    "nom": "Metro Plus Lévis / Jean Coutu 2 / Les Promenades de Lévis 1 / McDonald's 2 / ...",
+    "matricule": "236",
+    "adresse": "5475 Guillaume-Couture, Lévis",
+    "quartier": "Lévis",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 237,
+    "nom": "Plastiques Gagnon 2 / Plastiques Gagnon 1",
+    "matricule": "237",
+    "adresse": "4780 Pascaline, Lévis",
+    "quartier": "Lévis",
+    "groupe": "0",
+    "type": "Industrie"
+  },
+  {
+    "no": 238,
+    "nom": "Barbacoa / Café Bonté Divine",
+    "matricule": "238",
+    "adresse": "5986-5994 Saint-Laurent, Lévis",
+    "quartier": "Lévis",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 239,
+    "nom": "Glace Frontenac Ltee 2 / Glace Frontenac Ltee 1",
+    "matricule": "239",
+    "adresse": "2405 Hêtrière, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 240,
+    "nom": "Bibliothèque Francine-McKenzie",
+    "matricule": "240",
+    "adresse": "100 Arlette-Fortin, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 241,
+    "nom": "Les Entrepôts mini-maxi",
+    "matricule": "241",
+    "adresse": "1100 Parc-Industriel, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Industrie"
+  },
+  {
+    "no": 242,
+    "nom": "Construction BML 1 / Construction BML 2",
+    "matricule": "242",
+    "adresse": "678 Taniata, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 243,
+    "nom": "Promenades St-Jean",
+    "matricule": "243",
+    "adresse": "782-798 Taniata, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 244,
+    "nom": "Banque nationale et centre commercial / Brunet 1 / Banque nationale et centre commercial / Brunet 3 / Banque nationale et centre commercial / Brunet 2",
+    "matricule": "244",
+    "adresse": "880 Taniata, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 245,
+    "nom": "Quincailerie Pro 2 / Quincailerie Pro 1",
+    "matricule": "245",
+    "adresse": "967 Taniata, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 246,
+    "nom": "Depanneur Mari-Pier Enr",
+    "matricule": "246",
+    "adresse": "2980-2986 Vanier, Lévis",
+    "quartier": "Saint-Jean-Chrysostome",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 247,
+    "nom": "École Clair-Soleil",
+    "matricule": "247",
+    "adresse": "363-365 Laure-Conan, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 248,
+    "nom": "Transport Robert 1 / Transport Robert 3 / Transport Robert 2",
+    "matricule": "248",
+    "adresse": "1040-1050 Olivier, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "0",
+    "type": "Industrie"
+  },
+  {
+    "no": 249,
+    "nom": "Complexe aquatique",
+    "matricule": "249",
+    "adresse": "1065 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 250,
+    "nom": "École L'envol 1 / École L'envol 2",
+    "matricule": "250",
+    "adresse": "1101 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 251,
+    "nom": "Medway / Genium / Garage/ Imprimerie / ...",
+    "matricule": "251",
+    "adresse": "820 Rivières, Lévis",
+    "quartier": "Saint-Nicolas",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 252,
+    "nom": "Ville de Lévis garage municipal 4 / Ville de Lévis garage municipal 2 / Ville de Lévis garage municipal 3 / ...",
+    "matricule": "252",
+    "adresse": "470 2e avenue, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "0",
+    "type": "Industrie"
+  },
+  {
+    "no": 253,
+    "nom": "Plusieurs Bureaux - Centre d'affaire Taïga 3 / Plusieurs Bureaux - Centre d'affaire Taïga 2 / Plusieurs Bureaux - Centre d'affaire Taïga 1",
+    "matricule": "253",
+    "adresse": "1100-1112 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 254,
+    "nom": "Alliance jeunesse Chutes-de-la-Chaudière 2 / Alliance jeunesse Chutes-de-la-Chaudière 1",
+    "matricule": "254",
+    "adresse": "1659 Guillaume-Couture, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 255,
+    "nom": "Club Curling Etchemin",
+    "matricule": "255",
+    "adresse": "235 Saint-Robert, Lévis",
+    "quartier": "Saint-Romuald",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 256,
+    "nom": "Bibliothèque Albert-Rousseau",
+    "matricule": "256",
+    "adresse": "709-711 Albert-Rousseau, Lévis",
+    "quartier": "Saint-Étienne-de-Lauzon",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 257,
+    "nom": "Aréna Bruno Verret St-Etienne 1",
+    "matricule": "257",
+    "adresse": "3030 Lagueux, Lévis",
+    "quartier": "Saint-Étienne-de-Lauzon",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 258,
+    "nom": "Shell 2 / Shell 1",
+    "matricule": "258",
+    "adresse": "3117 Lagueux, Lévis",
+    "quartier": "Saint-Étienne-de-Lauzon",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 259,
+    "nom": "Ryna Pizza",
+    "matricule": "259",
+    "adresse": "3990-3998 Rivières, Lévis",
+    "quartier": "Saint-Étienne-de-Lauzon",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 260,
+    "nom": "Aubert et Marois 1 / Aubert et Marois 2",
+    "matricule": "260",
+    "adresse": "4541 Rivières, Lévis",
+    "quartier": "Saint-Étienne-de-Lauzon",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 261,
+    "nom": "Centre des Loisirs Ville",
+    "matricule": "261",
+    "adresse": "3553 Brassard, Lévis",
+    "quartier": "Sainte-Hélène-de-Breakeyville",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 262,
+    "nom": "Garage Hallé et Fils",
+    "matricule": "262",
+    "adresse": "3210 Saint-Augustin, Lévis",
+    "quartier": "Sainte-Hélène-de-Breakeyville",
+    "groupe": "0",
+    "type": "Institution"
+  },
+  {
+    "no": 263,
+    "nom": "Les écuries de la Chaudière",
+    "matricule": "263",
+    "adresse": "3326-3420 Saint-Augustin, Lévis",
+    "quartier": "Sainte-Hélène-de-Breakeyville",
+    "groupe": "0",
+    "type": "Commerce"
+  },
+  {
+    "no": 264,
+    "nom": "Centre de Loisirs",
+    "matricule": "264",
+    "adresse": "2400 Sainte-Hélène, Lévis",
+    "quartier": "Sainte-Hélène-de-Breakeyville",
+    "groupe": "0",
+    "type": "Institution"
   }
+
 ];
 
 // INIT
